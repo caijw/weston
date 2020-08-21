@@ -164,6 +164,7 @@ struct weston_output_zoom {
 };
 
 /* bit compatible with drm definitions. */
+// kingwei: drm 位设置定义
 enum dpms_enum {
 	WESTON_DPMS_ON,
 	WESTON_DPMS_STANDBY,

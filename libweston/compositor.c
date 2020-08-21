@@ -4757,11 +4757,15 @@ static void
 weston_compositor_dpms(struct weston_compositor *compositor,
 		       enum dpms_enum state)
 {
+	// return;
         struct weston_output *output;
 
         wl_list_for_each(output, &compositor->output_list, link)
-		if (output->set_dpms)
+		if (output->set_dpms) {
+			printf("kingwei, set_dpms to output");
 			output->set_dpms(output, state);
+		}
+
 }
 
 /** Restores the compositor to active status
@@ -4776,6 +4780,7 @@ weston_compositor_dpms(struct weston_compositor *compositor,
  * Restarts the idle timer.
  * \ingroup compositor
  */
+// kingwei: compositor 唤醒,重新设置idle timer的超时时间
 WL_EXPORT void
 weston_compositor_wake(struct weston_compositor *compositor)
 {
@@ -4835,9 +4840,11 @@ weston_compositor_offscreen(struct weston_compositor *compositor)
  *
  * \ingroup compositor
  */
+// kingwei: 关闭输出
 WL_EXPORT void
 weston_compositor_sleep(struct weston_compositor *compositor)
 {
+	// return;
 	if (compositor->state == WESTON_COMPOSITOR_SLEEPING)
 		return;
 

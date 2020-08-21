@@ -3966,6 +3966,7 @@ unfocus_all_seats(struct desktop_shell *shell)
 	}
 }
 
+// kingwei: 锁屏相关逻辑
 static void
 lock(struct desktop_shell *shell)
 {
@@ -4026,7 +4027,7 @@ unlock(struct desktop_shell *shell)
 	weston_desktop_shell_send_prepare_lock_surface(shell_resource);
 	shell->prepare_event_sent = true;
 }
-
+// kingwei: shell_fade_done_for_output 在 view 的fade out 后进行 lock
 static void
 shell_fade_done_for_output(struct weston_view_animation *animation, void *data)
 {
@@ -4076,9 +4077,11 @@ shell_fade_create_surface_for_output(struct desktop_shell *shell, struct shell_o
 	return view;
 }
 
+// kingwei: 息屏动画
 static void
 shell_fade(struct desktop_shell *shell, enum fade_type type)
 {
+	// return;
 	float tint;
 	struct shell_output *shell_output;
 
@@ -4088,6 +4091,7 @@ shell_fade(struct desktop_shell *shell, enum fade_type type)
 		break;
 	case FADE_OUT:
 		tint = 1.0;
+		// tint = 0.5;
 		break;
 	default:
 		weston_log("shell: invalid fade type\n");
@@ -4118,11 +4122,33 @@ shell_fade(struct desktop_shell *shell, enum fade_type type)
 		} else if (shell_output->fade.animation) {
 			weston_fade_update(shell_output->fade.animation, tint);
 		} else {
+			if (type == FADE_IN) {
+				tint = 0;
+			weston_log("shell_fade FADE_IN\n");
 			shell_output->fade.animation =
 				weston_fade_run(shell_output->fade.view,
-						1.0 - tint, tint, 300.0,
+						1, 0, 300.0,
 						shell_fade_done_for_output, shell_output);
+			// shell_output->fade.animation =
+			// 	weston_fade_run(shell_output->fade.view,
+			// 			1.0 - tint, tint, 300.0,
+			// 			shell_fade_done_for_output, shell_output);
+			} else if (type == FADE_OUT) {
+				continue;
+				tint = 1.0;
+				weston_log("shell_fade FADE_OUT\n");
+			shell_output->fade.animation =
+				weston_fade_run(shell_output->fade.view,
+						0, 1, 300.0,
+						shell_fade_done_for_output, shell_output);
+			// shell_output->fade.animation =
+			// 	weston_fade_run(shell_output->fade.view,
+			// 			1.0 - tint, tint, 300.0,
+			// 			shell_fade_done_for_output, shell_output);
+			}
+
 		}
+
 	}
 }
 
